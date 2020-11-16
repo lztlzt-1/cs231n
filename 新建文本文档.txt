@@ -1,0 +1,23 @@
+best_val = -1
+best_stats = None
+learning_rates = [1e-2,1e-3]
+regularization_strengths = [0.4,0.5,0.6]
+results = {}
+iters = 2000
+for lr in learning_rates:
+    for rs in regularization_strengths:
+        net = TwoLayerNet(input_size,hidden_size,num_classes)
+        stats = net.train(X_train,y_train,X_val,y_val,num_iters = iters,batch_size = 200,learning_rate = lr,learning_rate_decay = 0.95,reg = rs)
+        y_train_pred = net.predict(X_train)
+        acc_train = np.mean(y_train == y_train_pred)
+        y_val_pred = net.predict(X_val)
+        acc_val = np.mean(y_val == y_val_pred)
+        results[(lr,rs)] = (acc_train,acc_val)
+        if best_val < acc_val:
+            best_stats = stats
+            best_val = acc_val
+            best_net = net
+for (lr,reg) in sorted(results):
+    (train_accuracy,val_accuracy) = results[(lr,reg)]
+    print('lr:%f,reg:%f,train_accuracy:%f,val_accuracy:%f' %(lr,reg,train_accuracy,val_accuracy))
+print('best validation accuracy achieved during cross-validation:%f' %best_val)
